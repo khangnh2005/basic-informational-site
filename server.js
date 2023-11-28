@@ -1,28 +1,30 @@
-const http = require("http");
+const express = require("express");
 const fs = require("fs/promises");
 
-const server = http.createServer(async (request, response) => {
-  request.on("error", err => {
-    console.error(err);
-  });
+const app = express();
 
-  const {url} = request;
+const port = 8080;
 
-  let body;
-  if (url === "/") {
-    response.statusCode = 200;
-    body = await fs.readFile("./index.html");
-  } else if (url === "/about") {
-    response.statusCode = 200;
-    body = await fs.readFile("./about.html");
-  } else if (url === "/contact-me") {
-    response.statusCode = 200;
-    body = await fs.readFile("./contact-me.html");
-  } else {
-    response.statusCode = 404;
-    body = await fs.readFile("./404.html");
-  }
-  response.end(body);
+app.get("/", async (req, res) => {
+  res.set('Content-Type', 'text/html')
+  res.send(await fs.readFile("./index.html"));
 });
 
-server.listen(8080);
+app.get("/about", async (req, res) => {
+  res.set('Content-Type', 'text/html')
+  res.send(await fs.readFile("./about.html"));
+});
+
+app.get("/contact-me", async (req, res) => {
+  res.set('Content-Type', 'text/html')
+  res.send(await fs.readFile("./contact-me.html"));
+});
+
+app.get("*", async (req, res) => {
+  res.set('Content-Type', 'text/html')
+  res.send(await fs.readFile("./404.html"));
+})
+
+app.listen(port, () => {
+  console.log(`Example Express App running on port ${port}`);
+});
